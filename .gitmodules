@@ -1,0 +1,3 @@
+[submodule "external/DynamicMPNN"]
+	path = external/DynamicMPNN
+	url = https://github.com/Alex-Abrudan/DynamicMPNN

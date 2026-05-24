@@ -1,0 +1,4 @@
+pair_id,x0_pdb,x1_pdb,chain_id,length_hint,notes
+pair_001,data/pairs/pair_001/X0.pdb,data/pairs/pair_001/X1.pdb,A,120,metamorphic/small
+pair_002,data/pairs/pair_002/X0.pdb,data/pairs/pair_002/X1.pdb,A,150,hinge
+pair_003,data/pairs/pair_003/X0.pdb,data/pairs/pair_003/X1.pdb,A,180,small two-state pair

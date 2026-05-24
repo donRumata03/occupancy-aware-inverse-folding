@@ -1,0 +1,40 @@
+experiment_name: micro_proto
+output_dir: outputs/lambda_occupancy
+conformer_pairs_csv: experiments/lambda_occupancy/conformer_pairs_template.csv
+n_pairs: 3
+inverse_model: proto_mpnn
+forward_model: bioemu
+lambdas: [0.25, 0.5, 1.0, 2.0, 4.0]
+n_sequences_per_lambda: 10
+n_forward_samples: 30
+sampling_temperature: 0.1
+random_seed: 11
+strict: false
+
+inverse:
+  command_template:
+  extra_args: []
+
+bioemu:
+  executable_or_module:
+  device: cuda
+  batch_size: 1
+  extra_args: []
+  use_single_sequence_a3m: true
+  requested_samples_multiplier: 1.5
+  command_template:
+
+assignment:
+  metric: tm_score
+  use_hard_assignment: true
+  margin_delta: 0.0
+  allow_unknown: false
+  alignment_tool:
+
+bootstrap:
+  n_bootstrap: 10000
+  ci: 0.95
+
+plots:
+  selected_lambdas: [0.5, 1.0, 2.0]
+

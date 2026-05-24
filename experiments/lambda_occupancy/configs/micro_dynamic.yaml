@@ -1,0 +1,59 @@
+experiment_name: micro_dynamic
+output_dir: outputs/lambda_occupancy
+conformer_pairs_csv: experiments/lambda_occupancy/conformer_pairs_template.csv
+n_pairs: 3
+inverse_model: dynamic_mpnn
+forward_model: bioemu
+lambdas: [0.25, 0.5, 1.0, 2.0, 4.0]
+n_sequences_per_lambda: 10
+n_forward_samples: 30
+sampling_temperature: 0.1
+random_seed: 11
+strict: false
+
+inverse:
+  command_template:
+  extra_args: []
+  dynamicmpnn:
+    repo_path: external/DynamicMPNN
+    python_executable:
+    model_ref: external/DynamicMPNN/checkpoints/single_chain_k2.ckpt
+    device: auto
+    sampling_mode: single
+    refold_mode: single
+    af3_evaluate: false
+    chain_id:
+    alignment_state0:
+    alignment_state1:
+    extra_overrides: []
+    lambda_controls_sampling: false
+
+bioemu:
+  executable_or_module:
+  python_executable:
+  device: cuda
+  batch_size: 1
+  batch_size_100:
+  model_name:
+  filter_samples: false
+  convert_xtc_to_pdb: true
+  msa_host_url:
+  denoiser_config:
+  extra_args: []
+  use_single_sequence_a3m: true
+  requested_samples_multiplier: 1.5
+  command_template:
+
+assignment:
+  metric: tm_score
+  use_hard_assignment: true
+  margin_delta: 0.0
+  allow_unknown: false
+  alignment_tool:
+
+bootstrap:
+  n_bootstrap: 10000
+  ci: 0.95
+
+plots:
+  selected_lambdas: [0.5, 1.0, 2.0]
