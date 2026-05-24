@@ -1,0 +1,3 @@
+pair_id,x0_pdb,x1_pdb,chain_id,x0_chain_id,x1_chain_id,alignment_state0,alignment_state1,length_hint,notes
+benchmark_1bdt_1qtg,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1BDT.pdb,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1QTG.pdb,A,A,A,"(1, 52)","(1, 52)",52,DynamicMPNN packaged benchmark pair
+benchmark_1jtb_1lip,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1JTB-6.pdb,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1LIP-2.pdb,A,A,A,"(1, 91)","(1, 91)",91,DynamicMPNN packaged benchmark pair

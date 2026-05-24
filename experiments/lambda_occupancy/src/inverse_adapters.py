@@ -145,7 +145,9 @@ class DynamicMPNNAdapter:
             )
 
         chain_id = dynamic_cfg.get("chain_id") or pair.chain_id
-        if not chain_id:
+        state1_chain_id = pair.x0_chain_id or chain_id
+        state2_chain_id = pair.x1_chain_id or chain_id
+        if not state1_chain_id or not state2_chain_id:
             raise ValueError(f"DynamicMPNN requires a chain_id for pair {pair.pair_id}")
 
         run_dir = output_csv.with_suffix("")
@@ -165,17 +167,19 @@ class DynamicMPNNAdapter:
             f"eval.refold_mode={dynamic_cfg.get('refold_mode', 'single')}",
             f"eval.af3_evaluate={str(bool(dynamic_cfg.get('af3_evaluate', False))).lower()}",
             f"eval.targets.state1.pdb_path={_hydra_path(pair.x0_pdb)}",
-            f"eval.targets.state1.chain_id={chain_id}",
+            f"eval.targets.state1.chain_id={state1_chain_id}",
             f"eval.targets.state2.pdb_path={_hydra_path(pair.x1_pdb)}",
-            f"eval.targets.state2.chain_id={chain_id}",
+            f"eval.targets.state2.chain_id={state2_chain_id}",
             f"model.temperature={float(config['sampling_temperature'])}",
             f"output_dir={_hydra_path(run_dir)}",
             f"hydra.run.dir={_hydra_path(run_dir)}",
         ]
-        if dynamic_cfg.get("alignment_state0"):
-            hydra_overrides.append(f"eval.alignment.state1={_hydra_quoted(dynamic_cfg['alignment_state0'])}")
-        if dynamic_cfg.get("alignment_state1"):
-            hydra_overrides.append(f"eval.alignment.state2={_hydra_quoted(dynamic_cfg['alignment_state1'])}")
+        alignment_state0 = dynamic_cfg.get("alignment_state0") or pair.alignment_state0
+        alignment_state1 = dynamic_cfg.get("alignment_state1") or pair.alignment_state1
+        if alignment_state0:
+            hydra_overrides.append(f"eval.alignment.state1={_hydra_quoted(alignment_state0)}")
+        if alignment_state1:
+            hydra_overrides.append(f"eval.alignment.state2={_hydra_quoted(alignment_state1)}")
         hydra_overrides.extend(str(item) for item in dynamic_cfg.get("extra_overrides", []))
         hydra_overrides.extend(str(item) for item in inverse_cfg.get("extra_args", []))
 

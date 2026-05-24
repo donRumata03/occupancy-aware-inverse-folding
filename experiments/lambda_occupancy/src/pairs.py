@@ -7,7 +7,18 @@ from typing import Any
 from .utils import read_csv, write_csv
 
 
-PAIR_FIELDS = ["pair_id", "x0_pdb", "x1_pdb", "chain_id", "length_hint", "notes"]
+PAIR_FIELDS = [
+    "pair_id",
+    "x0_pdb",
+    "x1_pdb",
+    "chain_id",
+    "x0_chain_id",
+    "x1_chain_id",
+    "alignment_state0",
+    "alignment_state1",
+    "length_hint",
+    "notes",
+]
 
 
 @dataclass(frozen=True)
@@ -16,6 +27,10 @@ class ConformerPair:
     x0_pdb: Path
     x1_pdb: Path
     chain_id: str = ""
+    x0_chain_id: str = ""
+    x1_chain_id: str = ""
+    alignment_state0: str = ""
+    alignment_state1: str = ""
     length_hint: int | None = None
     notes: str = ""
 
@@ -34,6 +49,10 @@ def create_template_csv(path: str | Path) -> None:
             "x0_pdb": "data/pairs/pair_001/X0.pdb",
             "x1_pdb": "data/pairs/pair_001/X1.pdb",
             "chain_id": "A",
+            "x0_chain_id": "",
+            "x1_chain_id": "",
+            "alignment_state0": "",
+            "alignment_state1": "",
             "length_hint": "120",
             "notes": "metamorphic/small",
         },
@@ -42,6 +61,10 @@ def create_template_csv(path: str | Path) -> None:
             "x0_pdb": "data/pairs/pair_002/X0.pdb",
             "x1_pdb": "data/pairs/pair_002/X1.pdb",
             "chain_id": "A",
+            "x0_chain_id": "",
+            "x1_chain_id": "",
+            "alignment_state0": "",
+            "alignment_state1": "",
             "length_hint": "150",
             "notes": "hinge",
         },
@@ -50,6 +73,10 @@ def create_template_csv(path: str | Path) -> None:
             "x0_pdb": "data/pairs/pair_003/X0.pdb",
             "x1_pdb": "data/pairs/pair_003/X1.pdb",
             "chain_id": "A",
+            "x0_chain_id": "",
+            "x1_chain_id": "",
+            "alignment_state0": "",
+            "alignment_state1": "",
             "length_hint": "180",
             "notes": "small two-state pair",
         },
@@ -76,6 +103,10 @@ def load_pairs(path: str | Path, limit: int | None = None, create_if_missing: bo
                 x0_pdb=Path(row["x0_pdb"]),
                 x1_pdb=Path(row["x1_pdb"]),
                 chain_id=row.get("chain_id", ""),
+                x0_chain_id=row.get("x0_chain_id", ""),
+                x1_chain_id=row.get("x1_chain_id", ""),
+                alignment_state0=row.get("alignment_state0", ""),
+                alignment_state1=row.get("alignment_state1", ""),
                 length_hint=int(length_hint) if length_hint else None,
                 notes=row.get("notes", ""),
             )
@@ -97,10 +128,13 @@ def validate_pairs(pairs: list[ConformerPair]) -> list[dict[str, Any]]:
                 "x0_pdb": str(pair.x0_pdb),
                 "x1_pdb": str(pair.x1_pdb),
                 "chain_id": pair.chain_id,
+                "x0_chain_id": pair.x0_chain_id,
+                "x1_chain_id": pair.x1_chain_id,
+                "alignment_state0": pair.alignment_state0,
+                "alignment_state1": pair.alignment_state1,
                 "length_hint": pair.length_hint or "",
                 "notes": pair.notes,
                 "preprocessing_warnings": "; ".join(warnings),
             }
         )
     return metadata
-
