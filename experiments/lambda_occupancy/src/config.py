@@ -60,6 +60,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "margin_delta": 0.0,
         "allow_unknown": False,
         "alignment_tool": None,
+        "allow_python_fallback": False,
     },
     "bootstrap": {
         "n_bootstrap": 10000,

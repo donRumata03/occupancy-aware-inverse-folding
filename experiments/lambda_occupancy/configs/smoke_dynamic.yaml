@@ -1,6 +1,6 @@
 experiment_name: smoke_dynamic
 output_dir: outputs/lambda_occupancy
-conformer_pairs_csv: experiments/lambda_occupancy/conformer_pairs_template.csv
+conformer_pairs_csv: experiments/lambda_occupancy/conformer_pairs_benchmark.csv
 n_pairs: 1
 inverse_model: dynamic_mpnn
 forward_model: bioemu
@@ -50,6 +50,7 @@ assignment:
   margin_delta: 0.0
   allow_unknown: false
   alignment_tool:
+  allow_python_fallback: true
 
 bootstrap:
   n_bootstrap: 10000
