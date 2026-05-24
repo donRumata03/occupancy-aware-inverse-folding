@@ -174,6 +174,9 @@ class DynamicMPNNAdapter:
             f"output_dir={_hydra_path(run_dir)}",
             f"hydra.run.dir={_hydra_path(run_dir)}",
         ]
+        apply_lambda_to_pooling = bool(dynamic_cfg.get("apply_lambda_to_pooling", False))
+        if apply_lambda_to_pooling:
+            hydra_overrides.append(f"+eval.conformation_weights=[{weights[0]:.17g},{weights[1]:.17g}]")
         alignment_state0 = dynamic_cfg.get("alignment_state0") or pair.alignment_state0
         alignment_state1 = dynamic_cfg.get("alignment_state1") or pair.alignment_state1
         if alignment_state0:
@@ -205,7 +208,9 @@ class DynamicMPNNAdapter:
             "effective_weight0": weights[0],
             "effective_weight1": weights[1],
             "dynamicmpnn_samples_csv": str(samples_csv),
-            "lambda_controls_sampling": bool(dynamic_cfg.get("lambda_controls_sampling", False)),
+            "lambda_controls_sampling": apply_lambda_to_pooling,
+            "lambda_applied_to_dynamic_pooling": apply_lambda_to_pooling,
+            "pooling_mode": "weighted_masked_mean" if apply_lambda_to_pooling else "unweighted_mean",
         }
         if proc.returncode != 0:
             raise RuntimeError(f"DynamicMPNN command failed: {' '.join(command)}\n{proc.stderr}")
@@ -232,8 +237,13 @@ class DynamicMPNNAdapter:
                         "native_sequence_id": row.get("sequence_id", ""),
                         "native_length": row.get("length", ""),
                         "lambda_note": (
-                            "The public DynamicMPNN sampler does not expose state-weighted lambda control; "
-                            "weights are recorded for experiment bookkeeping."
+                            "Lambda weights were applied through the repository's inference-time "
+                            "DynamicMPNN weighted-pooling patch."
+                            if apply_lambda_to_pooling
+                            else (
+                                "The public DynamicMPNN sampler does not expose state-weighted lambda control; "
+                                "weights are recorded for experiment bookkeeping."
+                            )
                         ),
                     },
                 )

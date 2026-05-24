@@ -167,14 +167,42 @@ Alternatively, activate the DynamicMPNN environment and run the experiment scrip
 
 ### Lambda Handling
 
-The public DynamicMPNN sampler does not expose a state-weighted lambda or occupancy-control parameter. The adapter still accepts the experiment's `(X0, X1, lambda)` interface and records normalized bookkeeping weights:
+Native upstream DynamicMPNN uses symmetric conformation pooling. It averages the encoded conformer features with a masked mean and does not define a calibrated occupancy-control parameter.
+
+This repository adds an optional inference-time weighted-pooling ablation for DynamicMPNN. When enabled with:
+
+```yaml
+inverse:
+  dynamicmpnn:
+    apply_lambda_to_pooling: true
+```
+
+the adapter maps the experiment's lambda to two conformation weights:
 
 ```text
 alpha = lambda / (1 + lambda)
 weights = [1 - alpha, alpha]
 ```
 
-Those weights are saved in sequence metadata, but with the public DynamicMPNN checkpoint they do not change sampling. This means DynamicMPNN can be used as a multi-state inverse-folding generator here, but it is not a valid test of a lambda-controlled occupancy knob unless upstream adds a state-weight hook or a patched sampler is used.
+The DynamicMPNN wrapper then applies those weights during inference-time pooling:
+
+```text
+pooled = sum_k mask_k * weight_k * feature_k / sum_k mask_k * weight_k
+```
+
+This is not native DynamicMPNN behavior and should be interpreted as an ablation of state-weighted pooled features, not as a trained or calibrated DynamicMPNN occupancy control mechanism. If `apply_lambda_to_pooling: false`, the original symmetric masked mean is preserved and lambda weights are saved only as metadata.
+
+Generated sequence metadata records:
+
+```text
+lambda_value
+effective_weight0
+effective_weight1
+lambda_applied_to_dynamic_pooling
+pooling_mode
+```
+
+Generation uses the same DynamicMPNN sampling seed for all lambdas for a given conformer pair. This keeps the random stream matched across lambdas so differences are driven by weighted pooling rather than lambda-specific seed changes.
 
 If you need a custom weighted sampler, keep using `inverse.command_template`. The command template may use:
 
@@ -197,6 +225,12 @@ sequence_id,pair_id,lambda_value,inverse_model,seed,sequence,temperature
 ```
 
 The exact command and effective weights are stored in per-sequence metadata.
+
+Weighted-pooling self-check, from an environment with DynamicMPNN dependencies:
+
+```bash
+python experiments/lambda_occupancy/scripts/weighted_pooling_self_check.py
+```
 
 ## Manual Sequence Fallback
 

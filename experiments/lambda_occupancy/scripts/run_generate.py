@@ -45,7 +45,7 @@ def main(argv: list[str] | None = None) -> int:
     records = []
     for pair_idx, pair in enumerate(pairs):
         for lambda_value in cfg["lambdas"]:
-            seed = int(cfg["random_seed"]) + pair_idx * 10000 + int(round(float(lambda_value) * 1000))
+            seed = int(cfg["random_seed"]) + pair_idx * 10000
             try:
                 records.extend(
                     adapter.generate_sequences(

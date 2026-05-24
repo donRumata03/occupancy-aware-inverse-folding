@@ -36,6 +36,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
             "alignment_state1": None,
             "extra_overrides": [],
             "lambda_controls_sampling": False,
+            "apply_lambda_to_pooling": False,
         },
     },
     "bioemu": {

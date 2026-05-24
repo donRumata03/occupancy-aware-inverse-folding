@@ -26,7 +26,8 @@ inverse:
     alignment_state0: "(1, 52)"
     alignment_state1: "(1, 52)"
     extra_overrides: []
-    lambda_controls_sampling: false
+    lambda_controls_sampling: true
+    apply_lambda_to_pooling: true
 
 bioemu:
   executable_or_module:
