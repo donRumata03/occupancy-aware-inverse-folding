@@ -19,8 +19,12 @@ def plot_response_curves(rows: list[dict[str, Any]], output_path: str | Path) ->
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(8, 5))
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    lambda_values: set[float] = set()
     for row in rows:
         grouped[row["pair_id"]].append(row)
+        lambda_value = _as_float(row["lambda_value"])
+        if lambda_value > 0:
+            lambda_values.add(lambda_value)
     if not grouped:
         ax.text(0.5, 0.5, "No response-curve rows available", ha="center", va="center")
     for pair_id, pair_rows in grouped.items():
@@ -32,6 +36,10 @@ def plot_response_curves(rows: list[dict[str, Any]], output_path: str | Path) ->
         ax.plot(x, y, marker="o", label=pair_id)
         ax.fill_between(x, lower, upper, alpha=0.15)
     ax.set_xscale("log")
+    if lambda_values:
+        ticks = sorted(lambda_values)
+        ax.set_xticks(ticks)
+        ax.set_xticklabels([f"{value:g}" for value in ticks])
     ax.set_ylim(-0.02, 1.02)
     ax.set_xlabel("lambda")
     ax.set_ylabel("mu_hat_1(lambda)")
