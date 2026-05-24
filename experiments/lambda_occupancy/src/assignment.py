@@ -44,8 +44,8 @@ def assign_forward_sample(row: dict[str, Any], pair: ConformerPair, config: dict
     metric = config.get("assignment", {}).get("metric", "tm_score")
     if metric != "tm_score":
         raise ValueError(f"Unsupported assignment metric: {metric}")
-    a_m0, meta0 = tm_score(structure_path, pair.x0_pdb, config)
-    a_m1, meta1 = tm_score(structure_path, pair.x1_pdb, config)
+    a_m0, meta0 = tm_score(structure_path, pair.x0_pdb, config, target_chain_id=pair.chain_id)
+    a_m1, meta1 = tm_score(structure_path, pair.x1_pdb, config, target_chain_id=pair.chain_id)
     delta = a_m1 - a_m0
     assigned = hard_assign(
         a_m0,
@@ -72,4 +72,3 @@ def assign_forward_sample(row: dict[str, Any], pair: ConformerPair, config: dict
 
 def save_assignment_scores(path: str | Path, rows: list[dict[str, Any]]) -> None:
     write_csv(path, rows, ASSIGNMENT_FIELDS)
-

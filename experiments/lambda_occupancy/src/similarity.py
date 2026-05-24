@@ -32,13 +32,18 @@ def parse_tm_score(output: str) -> float:
     return max(scores)
 
 
-def tm_score(mobile: str | Path, target: str | Path, config: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+def tm_score(
+    mobile: str | Path,
+    target: str | Path,
+    config: dict[str, Any],
+    target_chain_id: str | None = None,
+) -> tuple[float, dict[str, Any]]:
     assignment_cfg = config.get("assignment", {})
     try:
         tool = find_alignment_tool(assignment_cfg.get("alignment_tool"))
     except AlignmentToolMissing:
         if assignment_cfg.get("allow_python_fallback"):
-            return ca_tm_score_fallback(mobile, target)
+            return ca_tm_score_fallback(mobile, target, target_chain_id=target_chain_id)
         raise
     command = [tool, str(mobile), str(target)]
     proc = subprocess.run(command, check=False, capture_output=True, text=True)
@@ -53,9 +58,13 @@ def tm_score(mobile: str | Path, target: str | Path, config: dict[str, Any]) -> 
     return parse_tm_score(proc.stdout + "\n" + proc.stderr), metadata
 
 
-def ca_tm_score_fallback(mobile: str | Path, target: str | Path) -> tuple[float, dict[str, Any]]:
+def ca_tm_score_fallback(
+    mobile: str | Path,
+    target: str | Path,
+    target_chain_id: str | None = None,
+) -> tuple[float, dict[str, Any]]:
     mobile_coords = _read_ca_coords(mobile)
-    target_coords = _read_ca_coords(target)
+    target_coords = _read_ca_coords(target, chain_id=target_chain_id)
     n = min(len(mobile_coords), len(target_coords))
     if n < 3:
         raise ValueError(f"Need at least 3 CA atoms for fallback alignment: {mobile}, {target}")
@@ -71,19 +80,23 @@ def ca_tm_score_fallback(mobile: str | Path, target: str | Path) -> tuple[float,
         "target": str(target),
         "aligned_ca_count": n,
         "target_ca_count": len(target_coords),
+        "target_chain_id": target_chain_id or "",
         "d0": d0,
         "note": "Approximate CA-order TM-like score used because no TM-align/US-align executable was available.",
     }
     return score, metadata
 
 
-def _read_ca_coords(path: str | Path) -> list[tuple[tuple[str, str, str], np.ndarray]]:
+def _read_ca_coords(path: str | Path, chain_id: str | None = None) -> list[tuple[tuple[str, str, str], np.ndarray]]:
     coords: list[tuple[tuple[str, str, str], np.ndarray]] = []
     with Path(path).open("r", encoding="utf-8", errors="ignore") as handle:
         for line in handle:
             if not line.startswith("ATOM"):
                 continue
             if line[12:16].strip() != "CA":
+                continue
+            chain = line[21].strip()
+            if chain_id and chain != chain_id:
                 continue
             key = (line[21].strip(), line[22:26].strip(), line[26].strip())
             coord = np.asarray(
@@ -92,7 +105,8 @@ def _read_ca_coords(path: str | Path) -> list[tuple[tuple[str, str, str], np.nda
             )
             coords.append((key, coord))
     if not coords:
-        raise ValueError(f"No CA atoms found in PDB: {path}")
+        suffix = f" for chain {chain_id}" if chain_id else ""
+        raise ValueError(f"No CA atoms found in PDB: {path}{suffix}")
     return coords
 
 

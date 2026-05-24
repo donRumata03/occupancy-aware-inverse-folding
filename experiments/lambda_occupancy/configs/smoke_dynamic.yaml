@@ -23,8 +23,8 @@ inverse:
     refold_mode: single
     af3_evaluate: false
     chain_id:
-    alignment_state0:
-    alignment_state1:
+    alignment_state0: "(1, 52)"
+    alignment_state1: "(1, 52)"
     extra_overrides: []
     lambda_controls_sampling: false
 

@@ -1,2 +1,2 @@
 pair_id,x0_pdb,x1_pdb,chain_id,length_hint,notes
-benchmark_1bdt_1qtg,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1BDT.pdb,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1QTG.pdb,A,60,DynamicMPNN packaged benchmark pair for smoke runs
+benchmark_1bdt_1qtg,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1BDT.pdb,external/DynamicMPNN/src/dynamicmpnn/resources/benchmarks/pdb/1QTG.pdb,A,52,DynamicMPNN packaged benchmark pair for smoke runs
