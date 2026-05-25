@@ -326,6 +326,25 @@ python experiments/lambda_occupancy/scripts/run_all.py --config experiments/lamb
 
 Use `--overwrite` to recompute an existing stage.
 
+## GPU Monitoring
+
+The GPU monitor samples `nvidia-smi` every `--interval` seconds and writes a raw CSV, a JSON summary with averages and p50/p90/p95/p99 percentiles, and a PNG plot:
+
+```bash
+python experiments/lambda_occupancy/scripts/monitor_gpu.py \
+  --interval 10 \
+  --output-dir outputs/lambda_occupancy/smoke_dynamic/gpu_monitor
+```
+
+To monitor a specific experiment process and stop automatically when it exits:
+
+```bash
+python experiments/lambda_occupancy/scripts/monitor_gpu.py \
+  --interval 10 \
+  --pid <run_all_pid> \
+  --output-dir outputs/lambda_occupancy/smoke_dynamic/gpu_monitor
+```
+
 ## DynamicMPNN Micro-Run
 
 After DynamicMPNN, `bioemu`, and `assignment.alignment_tool` are configured, and after `conformer_pairs_csv` points at real PDB files:
